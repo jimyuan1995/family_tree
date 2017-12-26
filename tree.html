@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>CUCCS Family Tree</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        /* Make the masthead heading the same height as the navigation */
+        .header h3 {
+            margin-top: 0;
+            margin-bottom: 0;
+            line-height: 40px;
+        }
+
+        /* Custom page footer */
+        .footer {
+            padding-top: 19px;
+            color: #777;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        /* Customize container */
+        @media (min-width: 800px) {
+            .container {
+                max-width: 800px;            
+            }
+        }
+        .container-narrow > hr {
+            margin: 30px 0;
+        }
+
+        /* Main marketing message and sign up button */
+        .jumbotron {
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header,
+        .footer {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    </style>
+    
+  </head>
+
+    <body>
+        <div class="container">
+            <div class="header clearfix">
+                <h3 class="text-muted">CUCCS Family Tree Project</h3>
+            </div>
+        
+            <div class="jumbotron" style="margin-top:30px">
+                <h1>Find your ancestors.</h1>
+                <p class="lead">Family tree has long been an effective way of representing complicated relationships within Chinese families. We built this site to help our members have a clear view of their family structures.</p>
+            </div>
+
+            <div>
+                <p class="lead">Instructions:</p>
+                <ul class="list-group">
+                    <li class="list-group-item">Input your crsid in the following box and hit "generate" button. </li>
+                    <li class="list-group-item">Click on the box should give more detailed information.</li>
+                </ul>
+            </div>
+
+            <hr/>
+
+            <form id="request_form">
+                <span type="text">Please enter your crsid:</span>
+                <input type="text" name="crsid">
+                <input type="submit" value="generate">
+            </form>
+        
+            <div id="ft_container" class="chart_container" style="padding-bottom:30px"></div>
+        
+            <footer class="footer">
+                <p>&copy; 2018 Cambridge University Chinese Cultural Society</p>
+            </footer>
+        </div>
+        
+   
+    <script type='text/javascript' src="jquery-1.9.1.js"></script>
+
+    <script src="js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript" src="jspdf-ggorgchart.js" ></script>
+    <script type="text/javascript" src="rgbcolor.js"></script> 
+    <script type="text/javascript" src="StackBlur.js"></script>
+    <script type="text/javascript" src="canvg.js"></script> 
+    <script type="text/javascript" src="raphael-ggorgchart.js"></script>  
+    <script type="text/javascript" src="lib_gg_orgchart_v100b1.js"></script>
+    <script type="text/javascript" src="drag-on.js"></script>
+    <script type="text/javascript" src="jsrender.js"></script>
+    <script type="text/javascript">
+    
+        // these values define only a subset of options for the organizational chart look & feel
+        // look into the library code for the default values for each parameter, that are used if not defined here
+        // "box_click_handler" will not work if we set "box_html_template", so we assigns it the null value
+        //
+        var oc_options_1 = {
+            data_id           : 1,                    // identifies the ID of the "data" JSON object that is paired with these options
+            container         : 'ft_container',     // name of the DIV where the chart will be drawn
+            box_color         : '#aaf',               // fill color of boxes
+            box_color_hover   : '#faa',               // fill color of boxes when mouse is over them
+            box_border_color  : '#008',               // stroke color of boxes
+            box_html_template : null,                 // id of element with template; don't use if you are using the box_click_handler
+            line_color        : '#f44',               // color of connectors
+            title_color       : '#000',               // color of titles
+            subtitle_color    : '#707',               // color of subtitles
+            max_text_width    : 20,                   // max width (in chars) of each line of text ('0' for no limit)
+            text_font         : 'Courier',            // font family to use (should be monospaced)
+            use_images        : false,                // use images within boxes?
+            box_click_handler : oc_box_click_handler, // handler (function) called on click on boxes (set to null if no handler)
+            debug             : false                 // set to true if you want to debug the library
+        };
+    
+        // handler for clicks on nodes
+        // this is completely configurable by you
+        //
+        function oc_box_click_handler(event, box) {
+            if (box.oc_id !== undefined) {
+                alert("His/her crsid is " + box.oc_id + " and she/he is " + box.oc_node.info);
+            }
+        }
+    
+        // load the JSON that defines the organizational structure from an external file and inmediatelly render the chart
+        // this is an important modification to the 0.4 version of the library; now is imperative to load the JSON from an external file
+        // inside the JSON, the "type" attribute for nodes can be: "subordinate", "staff" or "collateral"
+        // you can also use the "subtype" attribute for "dashed" nodes (use "subtype:dashed")
+        // look the examples and get used to the organizational structure representation
+        //
+        // IMPORTANT NOTE: because the JSON containing the organizational chart hierarchy is loaded using JQuery (that uses AJAX),
+        // this library will work only by loading the JSON from an http server (and not by opening a local file in your browser)
+        // the advantage are: separating data and logic, and capability of generating a dynamic JSON from a database (ex. with PHP)
+        //
+        // now render four versions of the same orgchart; the first one will use zoom, drag and print to PDF
+        // modify this function as you want; normally there is no need to draw more than one chart in each web page
+        //
+        var merged_options = false;
+        //
+        function ggOrgChart_render(crsid) {
+            var result;
+            result = ggOrgChart.render(oc_options_1, "data.php?q=" + crsid);
+            if (result === false) { alert("INFO: render() failed (bad 'options' or 'data' definition)"); return; }
+        }
+
+        $("#request_form").submit(function(event) {
+            var values = {};
+            $.each($("#request_form").serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+           
+
+            $.getJSON("check.php?q=" + values['crsid'], function(data) {
+                if (data.exist) {
+                    ggOrgChart.clean();
+                    ggOrgChart_render(values['crsid']);
+                } else {
+                    alert("Sorry, we can't find this crsid in our database.");
+                }
+            });
+            
+            event.preventDefault();
+        });
+    </script>
+  </body>
+</html>
