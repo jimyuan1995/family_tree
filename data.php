@@ -83,7 +83,6 @@
     class Node {
 		public $id;
 		public $title;
-		public $info;
 
 		function Node(string $_id, string $_title) {
 			$this->id = $_id;
@@ -117,9 +116,7 @@
 		$partner_id = get_partner($id);
 		if ($partner_id) {
 			$name = crsid_to_name($partner_id);
-			$node->info = "Married with $name";
-		} else {
-			$node->info = "Single.";
+			$node->subtitle = "Married with $name";
 		}
 
 		if (count($cids) > 0) {
